@@ -1,0 +1,9 @@
+source,asia,smoke,tub,lung,bronc,either,xray,dysp
+asia,False,False,True,False,False,False,False,False
+smoke,False,False,False,True,True,False,False,False
+tub,False,False,False,False,False,True,False,False
+lung,False,False,False,False,False,True,False,False
+bronc,False,False,False,False,False,False,False,True
+either,False,False,False,False,False,False,True,True
+xray,False,False,False,False,False,False,False,False
+dysp,False,False,False,False,False,False,False,False
