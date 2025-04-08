@@ -30,11 +30,12 @@ from numpy.core.multiarray import array as array
 # ********************** #
 #       Utilities        #
 # ********************** #
-def acyclic_orientation(A):
+def acyclic_orientation(A) -> np.array:
+    """Convert an undirected graph to a directed acyclic graph (DAG)."""
     return np.triu(A, k=1)
 
 
-def ig_to_adjmat(G: ig.Graph):
+def ig_to_adjmat(G: ig.Graph) -> np.array:
     return np.array(G.get_adjacency().data)
 
 
@@ -45,12 +46,12 @@ def max_edges_in_dag(num_nodes: int) -> int:
     """
     return int(num_nodes * (num_nodes - 1) / 2)
 
-def num_errors(order, adj):
+def num_errors(order, adj) -> int:
     """Compute the number of errors in the ordering."""
     err = 0
     for i in range(len(order)):
         err += adj[order[i + 1 :], order[i]].sum()
-    print(f"Number of errors in the ordering: {err}")
+    # print(f"Number of errors in the ordering: {err}")
     return err
 
 class GraphGenerator(metaclass=ABCMeta):
