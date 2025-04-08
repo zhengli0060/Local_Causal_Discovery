@@ -50,6 +50,7 @@ def num_errors(order, adj):
     err = 0
     for i in range(len(order)):
         err += adj[order[i + 1 :], order[i]].sum()
+    print(f"Number of errors in the ordering: {err}")
     return err
 
 class GraphGenerator(metaclass=ABCMeta):
@@ -121,6 +122,7 @@ class ErdosRenyi(GraphGenerator):
         expected_degree: int = None,
         p_edge: float = None,
         min_num_edges: int = 1,
+        def_topological_order: bool = False,
     ):
         if expected_degree is not None and p_edge is not None:
             raise ValueError(
@@ -151,6 +153,7 @@ class ErdosRenyi(GraphGenerator):
         self.expected_degree = expected_degree
         self.p_edge = p_edge
         self.min_num_edges = min_num_edges
+        self.def_topological_order = def_topological_order
 
     def get_random_graph(self) -> np.array:
         A = -np.ones((self.num_nodes, self.num_nodes))
@@ -177,10 +180,11 @@ class ErdosRenyi(GraphGenerator):
             nx.from_numpy_array(A, create_using=nx.DiGraph)
         ), "The generated random graph is not acyclic! No topological order can be defined"
 
-        trivial_order = range(self.num_nodes)
-        assert (
-            num_errors(trivial_order, A) > 0
-        ), f"The adjacency matrix of ErdosRenyi graph has trivial order."
+        if self.def_topological_order:
+            # Get topological order
+            G = nx.from_numpy_array(A, create_using=nx.DiGraph)
+            topological_order = list(nx.topological_sort(G))
+            A = A[topological_order, :][:, topological_order]
 
 
         return A
