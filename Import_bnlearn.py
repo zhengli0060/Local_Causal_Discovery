@@ -9,8 +9,8 @@ print(model['model'].nodes())
 print(type(adj_matrix))
 print(adj_matrix)
 print(model['model'].edges())
-
-# data_sample = bn.sampling(model, n=num_samples,verbose=0)
+bn.sampling()
+data_sample = bn.sampling(model, n=num_samples,verbose=0)
 
 # print(data_sample.head())
 # print(data_sample.info())
