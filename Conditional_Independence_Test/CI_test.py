@@ -8,6 +8,7 @@ from scipy.stats import norm
 from typing import Union, Set, Tuple, Dict, List
 import pandas as pd
 from pgmpy.estimators.CITests import chi_square,g_sq
+import networkx as nx
 
 def FisherZ_Test(X: Union[int, str], Y: Union[int, str], S: List[Union[int, str]], suffStat: Union[dict, pd.DataFrame], alpha: float = 0.05) -> Tuple[bool, float]:
     """
@@ -115,6 +116,24 @@ def G_sq_test(X: Union[int, str], Y: Union[int, str], S: List[Union[int, str]], 
     return CI, p_value
 
 
+def d_sep(X: Union[int, str], Y: Union[int, str], S: List[Union[int, str]], DAG: Union[np.ndarray, pd.DataFrame]) -> bool:
+    """
+    Check if X is d-separated from Y given S.
+
+    Parameters:
+    X, Y: int or str - Variables to test for conditional independence.
+    S: list - Conditioning set.
+    DAG: np.ndarray or pd.DataFrame - The DAG adjacency matrix. [num nodes, num nodes]
+
+    """
+    if isinstance(DAG, pd.DataFrame):
+        dag_matrix = DAG.to_numpy()
+    else:
+        dag_matrix = DAG
+    G = nx.DiGraph(dag_matrix)
+
+    if isinstance(X, str):
+        X = G.nodes.index(X)
 
 
 if __name__ == "__main__":

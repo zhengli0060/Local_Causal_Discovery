@@ -1,7 +1,7 @@
 """"
 Author: Zheng Li
 Date: 2025-04-08
-Description: This module implements a discrete model for simulating data from a directed acyclic graph (DAG).
+Description: This module implements a discrete model (conditional probability table) for simulating data from a directed acyclic graph (DAG).
 """
 
 import numpy as np

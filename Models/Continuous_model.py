@@ -23,7 +23,7 @@ class Continuous_Model:
         The first range is for negative weights, and the second range is for positive weights.
         The weights are sampled uniformly from these ranges.
     """
-    def __init__(self, DAG: pd.DataFrame = None, function_type: str = 'linear', noise_type: str = 'gaussian', sample_size: int = 1000, **kwargs):
+    def __init__(self, DAG: pd.DataFrame, function_type: str = 'linear', noise_type: str = 'gaussian', sample_size: int = 1000, **kwargs):
         self.kwargs = kwargs
         self.node_names = DAG.columns.tolist()
         self.num_nodes = len(DAG.columns)
