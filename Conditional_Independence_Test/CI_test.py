@@ -126,14 +126,26 @@ def d_sep(X: Union[int, str], Y: Union[int, str], S: List[Union[int, str]], DAG:
     DAG: np.ndarray or pd.DataFrame - The DAG adjacency matrix. [num nodes, num nodes]
 
     """
+    
+    if not isinstance(DAG, (np.ndarray, pd.DataFrame)):
+        raise TypeError("DAG must be a numpy array or pandas DataFrame.")
+    if DAG.shape[0] != DAG.shape[1]:
+        raise ValueError("DAG must be a square matrix.")
     if isinstance(DAG, pd.DataFrame):
-        dag_matrix = DAG.to_numpy()
+        node_list = DAG.index.tolist()  # get the node list from the index of the DataFrame
+        # create the nx.DiGraph object base on the above DAG adjacency matrix and node list
+        G = nx.DiGraph()
+        G.add_nodes_from(node_list)  
+        for source in node_list:
+            for target in node_list:
+                if DAG.loc[source, target] == 1:
+                    G.add_edge(source, target)
     else:
-        dag_matrix = DAG
-    G = nx.DiGraph(dag_matrix)
+        G = nx.DiGraph(DAG)
+    
+    # old version: nx.d_separated(G, X, Y, set(S))
+    return nx.is_d_separator(G, X, Y, set(S))
 
-    if isinstance(X, str):
-        X = G.nodes.index(X)
 
 
 if __name__ == "__main__":
@@ -171,8 +183,11 @@ if __name__ == "__main__":
     X = 'V1'
     Y = 'V3'
     S = ['V2']
-    CI_result = FisherZ_Test(X, Y, S, continuous_data)
-    print(f"Fisher Z Test: CI={CI_result[0]}, p-value={CI_result[1]}")
+    FisherZ_result = FisherZ_Test(X, Y, S, continuous_data)
+    print(f"Fisher Z Test: CI={FisherZ_result[0]}, p-value={FisherZ_result[1]}")
 
     G_sq_result = G_sq_test(X, Y, S, discrete_data)
     print(f"G-squared Test: CI={G_sq_result[0]}, p-value={G_sq_result[1]}")
+
+    d_sep_result = d_sep(X, Y, S, DAG)
+    print(f"D-separation: {d_sep_result}")

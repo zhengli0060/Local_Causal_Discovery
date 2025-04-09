@@ -33,7 +33,7 @@ class Discrete_Model:
             DAG (pd.DataFrame): Adjacency matrix of the DAG.
             sample_size (int): Number of samples to generate.
             num_values (int): Number of discrete values each variable can take.
-            min_prob (float): Minimum probability for any entry in the CPT.
+            min_prob (float): Minimum probability for any entry in the CPT(conditional probability table).
         """
         self.kwargs = kwargs
         self.node_names = DAG.columns.tolist()
@@ -159,9 +159,14 @@ if __name__ == '__main__':
     num_nodes = 3
     # num_edges = 2
     # DAG = simulate_dag(num_nodes, num_edges, 'ER')
+    """
+    Example usage:
+        V1 -> V2 -> V3
+    """
     DAG = np.array([[0, 1, 0],
                     [0, 0, 1],    
                     [0, 0, 0]])
+    
     # print(DAG)
     num_samples = 1000
     # Convert the adjacency matrix into a pandas DataFrame and assign indices to its rows and columns, labeled as V1, V2, V3, ..., Vn
