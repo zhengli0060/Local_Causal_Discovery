@@ -12,7 +12,8 @@ import pandas as pd
 from pgmpy.models import BayesianModel
 from pgmpy.factors.discrete import TabularCPD
 from pgmpy.sampling import BayesianModelSampling
-from Continuous_model import simulate_dag
+
+# from Continuous_model import simulate_dag
 
 
 def set_random_seed(seed):

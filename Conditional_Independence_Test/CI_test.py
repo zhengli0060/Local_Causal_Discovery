@@ -109,7 +109,7 @@ def G_sq_test(X: Union[int, str], Y: Union[int, str], S: List[Union[int, str]], 
     float - p-value of the test.
     """
 
-    #_,p_value,_ = chi_square(X, Y, S, data, boolean=False)   # g_sq
+    # _,p_value,_ = chi_square(X, Y, S, data, boolean=False)   # chi_square
     _,p_value,_ = g_sq(X, Y, S, data, boolean=False)   # g_sq
     CI = p_value > alpha
     return CI, p_value
@@ -118,19 +118,42 @@ def G_sq_test(X: Union[int, str], Y: Union[int, str], S: List[Union[int, str]], 
 
 
 if __name__ == "__main__":
-    # Example usage
-    data = pd.DataFrame({
-        'A': [1, 2, 3, 4, 5],
-        'B': [5, 4, 3, 2, 1],
-        'C': [1, 1, 1, 0, 0]
-    })
-    X = 'A'
-    Y = 'B'
-    S = ['C']
-    alpha = 0.05
+    import sys
+    import os
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+    from Models.Continuous_model import Continuous_Model
+    from Models.Discrete_model import Discrete_Model
+    """
+    Example usage:
+        V1 -> V2 -> V3
+    """
+    num_nodes = 3
+    DAG = np.array([[0, 1, 0],
+                    [0, 0, 1],    
+                    [0, 0, 0]])
+    # Convert the adjacency matrix into a pandas DataFrame and assign indices to its rows and columns, labeled as V1, V2, V3, ..., Vn
+    DAG = pd.DataFrame(DAG, index=[f'V{i+1}' for i in range(num_nodes)], columns=[f'V{i+1}' for i in range(num_nodes)])
 
-    CI_result = FisherZ_Test(X, Y, S, data)
+
+
+    num_samples = 100
+    model = Continuous_Model(DAG, function_type='linear', noise_type='gaussian', sample_size=num_samples)
+    model._read_information_DAG()
+    continuous_data = model.simulate_scm()
+
+    model = Discrete_Model(DAG, sample_size=num_samples, num_values=3, min_prob=0.05)
+    # model._read_information_DAG()
+    # model._read_bayesian_model()
+    discrete_data = model.generate_data()
+
+
+    alpha = 0.05
+    
+    X = 'V1'
+    Y = 'V3'
+    S = ['V2']
+    CI_result = FisherZ_Test(X, Y, S, continuous_data)
     print(f"Fisher Z Test: CI={CI_result[0]}, p-value={CI_result[1]}")
 
-    G_sq_result = G_sq_test(X, Y, S, data)
+    G_sq_result = G_sq_test(X, Y, S, discrete_data)
     print(f"G-squared Test: CI={G_sq_result[0]}, p-value={G_sq_result[1]}")
