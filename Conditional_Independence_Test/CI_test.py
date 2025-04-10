@@ -143,10 +143,40 @@ def d_sep(X: Union[int, str], Y: Union[int, str], S: List[Union[int, str]], DAG:
     else:
         G = nx.DiGraph(DAG)
     
-    # old version: nx.d_separated(G, X, Y, set(S))
+    # old version NetworkX < v3.5: nx.d_separated(G, X, Y, set(S)) 
     return nx.is_d_separator(G, X, Y, set(S))
 
+def ci_test(X: Union[int, str], Y: Union[int, str], S: List[Union[int, str]], data: Union[dict, pd.DataFrame], method_type: str = 'FisherZ', alpha: float = 0.05) -> Tuple[bool, float]:
+    """
+    Perform conditional independence test.
+method_type: str = 'FisherZ', 
+    Parameters:
+    X, Y: int or str - Variables to test for conditional independence.
+    S: list - Conditioning set.
+    data: dict or pd.DataFrame:
+        If dict -Sufficient statistics containing:
+            'C': Correlation matrix.
+            'n': Sample size.
+        If pd.DataFrame:
+            DataFrame containing the data and indexes.
+            or the DAG matrix.
+    method_type: str - Method type for CI test. Options are 'FisherZ', 'G_sq', or 'D_sep'.
+    alpha: float - Significance level.
 
+    Returns:
+    bool - CI is True means independent(separated), False means dependent(connected).
+    """
+    if not isinstance(data, (dict, pd.DataFrame)):
+        raise TypeError("data must be a dictionary or pandas DataFrame.")
+    
+    if method_type == 'FisherZ':
+        return FisherZ_Test(X, Y, S, data, alpha)[0]
+    elif method_type == 'G_sq':
+        return G_sq_test(X, Y, S, data, alpha)[0]
+    elif method_type == 'D_sep':
+        return d_sep(X, Y, S, data)
+    else:
+        raise ValueError("Invalid method_type. Choose 'FisherZ', 'G_sq', or 'D_sep'.")
 
 if __name__ == "__main__":
     import sys
