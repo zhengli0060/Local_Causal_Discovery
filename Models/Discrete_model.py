@@ -9,7 +9,8 @@ from scipy.special import expit as sigmoid
 import igraph as ig
 import random
 import pandas as pd
-from pgmpy.models import BayesianModel
+import networkx as nx
+from pgmpy.models import BayesianNetwork
 from pgmpy.factors.discrete import TabularCPD
 from pgmpy.sampling import BayesianModelSampling
 
@@ -39,6 +40,7 @@ class Discrete_Model:
         self.node_names = DAG.columns.tolist()
         self.num_nodes = len(DAG.columns)
         self.adj_matrix = DAG.to_numpy().astype(int)
+        self.nx_DAG = nx.from_pandas_adjacency(DAG, create_using=nx.DiGraph)
         self.sample_size = sample_size
         self.num_values = num_values
         self.min_prob = min_prob
@@ -57,7 +59,8 @@ class Discrete_Model:
         print(f"  - Adjacency matrix data type: {self.adj_matrix.dtype}")
         print(f"  - Is DAG: {'Yes' if self.bool_is_dag else 'No'}")
         print(f"  - Number of edges: {np.sum(self.adj_matrix)}")
-        print(f"  - Adjacency matrix:\n{self.adj_matrix}")
+        print(f"  - Adjacency matrix:\n{self.adj_matrix}\n")
+        print(f" - nx_DAG edges: \n{self.nx_DAG.edges()}")
         
 
     def is_dag(self) -> bool:
@@ -83,13 +86,13 @@ class Discrete_Model:
             BayesianModel: The Bayesian network model.
         """
 
-
+        
         # Create BayesianModel from adjacency matrix
-        bayesian_model = BayesianModel()
-        for i, node in enumerate(self.node_names):
-            parents = [self.node_names[j] for j in range(self.num_nodes) if self.adj_matrix[j, i] == 1]
-            for parent in parents:
-                bayesian_model.add_edge(parent, node)
+        bayesian_model = BayesianNetwork(self.nx_DAG)
+        # for i, node in enumerate(self.node_names):
+        #     parents = [self.node_names[j] for j in range(self.num_nodes) if self.adj_matrix[j, i] == 1]
+        #     for parent in parents:
+        #         bayesian_model.add_edge(parent, node)
 
         # Generate random CPTs for each node
         for i, node in enumerate(self.node_names):
@@ -156,23 +159,23 @@ class Discrete_Model:
 
 if __name__ == '__main__':
     # Test the Discrete_Model class
-    num_nodes = 3
-    # num_edges = 2
-    # DAG = simulate_dag(num_nodes, num_edges, 'ER')
+    num_nodes = 50
+    num_edges = 120
+    DAG = simulate_dag(num_nodes, num_edges, 'ER')
     """
     Example usage:
         V1 -> V2 -> V3
     """
-    DAG = np.array([[0, 1, 0],
-                    [0, 0, 1],    
-                    [0, 0, 0]])
+    # DAG = np.array([[0, 1, 0],
+    #                 [0, 0, 1],    
+    #                 [0, 0, 0]])
     
     # print(DAG)
     num_samples = 1000
     # Convert the adjacency matrix into a pandas DataFrame and assign indices to its rows and columns, labeled as V1, V2, V3, ..., Vn
     DAG = pd.DataFrame(DAG, index=[f'V{i+1}' for i in range(num_nodes)], columns=[f'V{i+1}' for i in range(num_nodes)])
     model = Discrete_Model(DAG, sample_size=num_samples, num_values=3, min_prob=0.05)
-    model._read_information_DAG()
-    model._read_bayesian_model()
+    # model._read_information_DAG()
+    # model._read_bayesian_model()
     data = model.generate_data()
     print(data.head())
