@@ -97,10 +97,10 @@ def TC_mb(data: pd.DataFrame, target: Union[int, str], alpha: float=0.05, method
 
 
     sample_size = data.shape[0]  # Get the number of samples
-    do_n = sample_size / 10
-    ceil_result = math.floor(do_n)
-    if ceil_result > 0:
-        alpha = alpha/(ceil_result*10)
+    # do_n = sample_size / 10
+    # ceil_result = math.floor(do_n)
+    # if ceil_result > 0:
+    #     alpha = alpha/(ceil_result*10)
     MB = []  # Initialize the candidate Markov blanket as empty
     ntest = 0  # Initialize the number of tests performed
 
@@ -120,10 +120,7 @@ def TC_mb(data: pd.DataFrame, target: Union[int, str], alpha: float=0.05, method
 
     return MB, ntest
 
-# num_samples = 1000
-# model = Continuous_Model(DAG, function_type='linear', noise_type='gaussian', sample_size=num_samples)
-# model._read_information_DAG()
-# data = model.simulate_scm()
+
 from Models.Continuous_model import simulate_dag, Continuous_Model
 import random
 if __name__ == "__main__":
